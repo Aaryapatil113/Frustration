@@ -243,19 +243,17 @@ function hub(){
   const v=params.get('v');if(v==='frustrating'||v==='adaptive'){params.delete('v');return queue(v);}
   $('#app').innerHTML=`<div class="panel">
     <h1>Can an interface notice you\u2019re stressed?</h1>
-    <p>Two short demos from our HCI project. Each has a regular version and a stress-aware version that notices frustration from how you type, click and move, then eases up without skipping any steps. We only measure timing, never what you type. Use made-up details.</p>
+    <p>A short demo from our HCI project. Try the regular version or the stress-aware version, which notices frustration from how you type, click and move, then makes things easier without skipping any steps. We only measure timing, never what you type. Use made-up details.</p>
     <div class="hubgrid">
       <div class="demo"><h2>Spring 2027 course registration</h2><p class="muted" style="margin:0">Get three courses before the registration window closes. About 2 minutes.</p>
         <div class="row"><button class="btn" data-go="frustrating">Regular version</button><button class="btn teal" data-go="adaptive">Stress-aware version</button></div></div>
-      <div class="demo"><h2>Team group chat</h2><p class="muted" style="margin:0">Your project is due tonight and a teammate hasn\u2019t sent their part. Message them and see how it lands. About 1 minute.</p>
-        <div class="row"><a class="btn" href="chat.html?m=standard" style="text-decoration:none">Regular chat</a><a class="btn teal" href="chat.html?m=aware" style="text-decoration:none">Stress-aware chat</a></div></div>
+
     </div>
     <div class="check" style="margin-top:16px"><input type="checkbox" id="mChk" ${showMeter?'checked':''}><label for="mChk">Show the live stress meter</label></div>
   </div>
   <p class="disclaim">Git Girls, Northeastern HCI class prototype. Not an official Northeastern University page.</p>`;
   $('#mChk').onchange=e=>{showMeter=e.target.checked;};
   document.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>queue(b.dataset.go));
-  document.querySelectorAll('a[href^="chat.html"]').forEach(a=>a.onclick=()=>{if(showMeter)a.href+='&meter=1';});
 }
 function queue(cond){
   let s=CONFIG.queueSeconds,pos=214;
