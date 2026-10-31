@@ -3,21 +3,22 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Stress-Aware Form Demo, Git Girls (Northeastern HCI)</title>
+<title>Stress-Aware Interface Demos, Git Girls (Northeastern HCI)</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700;900&display=swap" rel="stylesheet">
 <style>
 /*
-  Git Girls midterm demo: a short, deliberately frustrating Northeastern-style form.
-  Two versions: "frustrating" (patterns stay on) and "stress-aware" (patterns switch off as stress rises).
-  Link tricks: ?v=frustrating or ?v=adaptive skips the chooser.  ?meter=1 shows the live stress meter.
-  Class prototype only. Not an official Northeastern University page. Only key timing is measured, never what is typed.
+  Git Girls: Stress-aware course registration demo.
+  Versions: frustrating (friction stays) and stress-aware (friction eases as stress rises).
+  The adaptive version never removes required work. It explains, forgives, protects work, calms and pauses.
+  Links: ?v=frustrating or ?v=adaptive jumps straight in. ?meter=1 shows the live stress meter.
+  Class prototype. Not an official Northeastern University page. Only key timing is measured.
 */
 :root{
-  --bg:#F2F2F2; --surface:#FFFFFF; --ink:#1A1A1A; --muted:#595959; --faint:#9A9A9A; --line:#CFCFCF;
+  --bg:#F2F2F2; --surface:#FFFFFF; --ink:#1A1A1A; --muted:#595959; --faint:#9A9A9A; --line:#D0D0D0;
   --brand:#C8102E; --brand-dark:#A20C25; --brand-ink:#FFFFFF; --header:#000000;
-  --error:#B3261E; --error-bg:#FBEDEC; --help:#0F766E; --help-bg:#E6F4F2; --warn:#8A5A00; --promo:#FFF4D6; --focus:#2F6FDE;
+  --error:#B3261E; --error-bg:#FBEDEC; --help:#0F766E; --help-bg:#E6F4F2; --warn:#8A5A00; --warn-bg:#FFF3D6; --focus:#2F6FDE;
   color-scheme: light;
   box-sizing:border-box;
   padding-top:env(safe-area-inset-top,0px);
@@ -27,30 +28,32 @@
   :root:not([data-theme="light"]){
     --bg:#141414; --surface:#1F1F1F; --ink:#EDEDED; --muted:#A8A8A8; --faint:#6E6E6E; --line:#3A3A3A;
     --brand:#E0344F; --brand-dark:#C8102E; --brand-ink:#FFFFFF; --header:#000000;
-    --error:#F2867E; --error-bg:#3A2220; --help:#5CC8BA; --help-bg:#17322F; --warn:#E3B45A; --promo:#3A3220; --focus:#7AA7FF;
+    --error:#F2867E; --error-bg:#3A2220; --help:#5CC8BA; --help-bg:#17322F; --warn:#E3B45A; --warn-bg:#3A3120; --focus:#7AA7FF;
     color-scheme: dark;
   }
 }
 :root[data-theme="dark"]{
   --bg:#141414; --surface:#1F1F1F; --ink:#EDEDED; --muted:#A8A8A8; --faint:#6E6E6E; --line:#3A3A3A;
   --brand:#E0344F; --brand-dark:#C8102E; --brand-ink:#FFFFFF; --header:#000000;
-  --error:#F2867E; --error-bg:#3A2220; --help:#5CC8BA; --help-bg:#17322F; --warn:#E3B45A; --promo:#3A3220; --focus:#7AA7FF;
+  --error:#F2867E; --error-bg:#3A2220; --help:#5CC8BA; --help-bg:#17322F; --warn:#E3B45A; --warn-bg:#3A3120; --focus:#7AA7FF;
   color-scheme: dark;
 }
 *,*::before,*::after{box-sizing:inherit}
 html{scroll-padding-top:env(safe-area-inset-top,0px)}
 body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 "Source Sans 3","Segoe UI",Helvetica,Arial,sans-serif}
 body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--header)}
-button,input,select{font:inherit;color:inherit}
+button,input{font:inherit;color:inherit}
 :focus-visible{outline:3px solid var(--focus);outline-offset:2px}
 
 header.top{background:var(--header);color:#fff;border-bottom:4px solid var(--brand);padding:12px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
-.word{font-weight:700;font-size:1.15rem;letter-spacing:.01em}
+.word{font-weight:700;font-size:1.15rem}
 .word small{display:block;font-weight:400;font-size:.85rem;opacity:.8}
-.timer{font-variant-numeric:tabular-nums;font-weight:700;font-size:1.1rem;padding:4px 12px;border:1px solid rgba(255,255,255,.45);border-radius:4px}
+.timer{font-variant-numeric:tabular-nums;font-size:.95rem;padding:4px 12px;border:1px solid rgba(255,255,255,.45);border-radius:4px}
+.timer b{font-size:1.1rem}
 .timer.low{background:var(--brand);border-color:var(--brand)}
+.timer.held{background:var(--help);border-color:var(--help)}
 
-main{max-width:640px;margin:0 auto;padding:22px 16px 120px}
+main{max-width:720px;margin:0 auto;padding:20px 16px 120px}
 .panel{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:22px}
 h1{font-size:1.6rem;line-height:1.2;margin:0 0 8px}
 h2{font-size:1.15rem;margin:0 0 10px}
@@ -58,64 +61,77 @@ p{margin:0 0 12px}
 .muted{color:var(--muted)}
 .disclaim{font-size:.8rem;color:var(--muted);text-align:center;margin-top:14px}
 
-.choose{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:18px 0 8px}
-@media (max-width:520px){.choose{grid-template-columns:1fr}}
-.choice{border:2px solid var(--line);background:var(--surface);border-radius:6px;padding:16px;text-align:left;cursor:pointer}
-.choice b{display:block;font-size:1.1rem;margin-bottom:4px}
-.choice span{color:var(--muted);font-size:.95rem}
-.choice:hover{border-color:var(--brand)}
-.choice.alt:hover{border-color:var(--help)}
+/* hub */
+.hubgrid{display:grid;gap:14px;margin-top:16px}
+.demo{border:1px solid var(--line);border-radius:6px;padding:16px}
+.demo h2{margin-bottom:4px}
+.demo .row{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
 
-.steps{display:flex;gap:6px;margin:14px 0 18px;padding:0;list-style:none}
+/* task card */
+.task{background:var(--warn-bg);border:1px solid var(--line);border-radius:6px;padding:12px 14px;margin-bottom:14px;font-size:.95rem}
+.task b{display:block;margin-bottom:2px}
+.task ul{margin:4px 0 6px;padding-left:20px}
+.pin{font-family:"Courier New",monospace;font-weight:700;letter-spacing:.1em}
+
+.steps{display:flex;gap:6px;margin:12px 0 16px;padding:0;list-style:none}
 .steps li{flex:1;border-top:4px solid var(--line);padding-top:6px;font-size:.85rem;color:var(--muted)}
 .steps li.on{border-color:var(--brand);color:var(--ink);font-weight:600}
 .steps li.done{border-color:var(--help)}
 
+.search{display:flex;gap:8px;margin-bottom:12px}
+.search input{flex:1;padding:10px;border:1px solid var(--line);border-radius:4px;background:var(--surface)}
+.course{border:1px solid var(--line);border-radius:6px;margin-bottom:10px;overflow:hidden}
+.course .ch{background:var(--bg);padding:8px 12px;font-weight:700}
+.course .ch span{font-weight:400;color:var(--muted)}
+.sec{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 12px;border-top:1px solid var(--line);flex-wrap:wrap}
+.sec .when{font-size:.95rem}
+.sec .seats{font-size:.85rem;color:var(--muted)}
+.seats.low{color:var(--error);font-weight:700}
+.seats.pulse{animation:pulse 1s ease-in-out infinite}
+@keyframes pulse{50%{opacity:.35}}
+.tag{display:inline-block;font-size:.8rem;padding:1px 8px;border-radius:999px;margin-left:6px}
+.tag.bad{background:var(--error-bg);color:var(--error)}
+.tag.ok{background:var(--help-bg);color:var(--help)}
+.tag.held{background:var(--help-bg);color:var(--help)}
+.empty{color:var(--muted);padding:12px;border:1px dashed var(--line);border-radius:6px;text-align:center}
+.cart{margin-top:16px;border-top:2px solid var(--ink);padding-top:12px}
+.cart h2{display:flex;justify-content:space-between}
+.citem{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.citem small{display:block;color:var(--muted)}
+
 .field{margin-bottom:14px}
-.field > label,.lbl{display:block;font-weight:600;margin-bottom:4px}
-.opt{font-weight:400;color:var(--muted)}
+.field > label{display:block;font-weight:600;margin-bottom:4px}
 .field input[type=text],.field input[type=password]{width:100%;padding:10px;border:1px solid var(--line);border-radius:4px;background:var(--surface)}
-.field input::placeholder{color:var(--faint)}
-.field.bad input[type=text],.field.bad input[type=password]{border-color:var(--error);background:var(--error-bg)}
+.field.bad input{border-color:var(--error);background:var(--error-bg)}
 .field.good input{border-color:var(--help)}
 .err{color:var(--error);font-size:.9rem;margin-top:4px}
 .hint{color:var(--help);font-size:.9rem;margin-top:4px}
+.pinrow{display:flex;gap:8px}
+.pinrow input{flex:1}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:0 12px}
+@media (max-width:520px){.grid2{grid-template-columns:1fr}}
 .check{display:flex;gap:8px;align-items:flex-start}
 .check input{margin-top:5px;width:18px;height:18px;flex:none}
-.codebox{display:inline-block;font-family:"Courier New",monospace;font-size:1.5rem;letter-spacing:.35em;padding:6px 14px;margin-bottom:8px;border:1px dashed var(--line);background:repeating-linear-gradient(-30deg,transparent 0 6px,rgba(127,127,127,.15) 6px 8px);transform:skewX(-10deg);user-select:none}
-.codebox.easy{transform:none;letter-spacing:.2em;background:none}
-.pwlist{margin:6px 0 0;padding-left:18px;font-size:.9rem}
-.pwlist li.ok{color:var(--help)} .pwlist li.no{color:var(--muted)}
-.terms{height:96px;overflow-y:auto;border:1px solid var(--line);border-radius:4px;padding:8px 12px;font-size:.85rem;color:var(--muted);background:var(--bg);margin-bottom:8px}
-.terms p{margin:0 0 8px}
 
 .banner{border-left:4px solid var(--error);background:var(--error-bg);padding:10px 12px;margin-bottom:14px;border-radius:0 4px 4px 0}
+.banner ul{margin:6px 0 0;padding-left:20px}
+.fix{margin-top:6px}
 .adapt{border-left:4px solid var(--help);background:var(--help-bg);padding:10px 12px;margin-bottom:10px;border-radius:0 4px 4px 0;display:flex;justify-content:space-between;gap:12px;align-items:center}
 .adapt button{background:none;border:none;color:var(--help);font-weight:600;text-decoration:underline;cursor:pointer;padding:4px}
-.promo{background:var(--promo);border:1px solid var(--line);border-radius:4px;padding:16px 14px;margin-top:14px;text-align:center}
-.promo b{display:block}
 
 .actions{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-top:20px;align-items:center}
 .btn{border:1px solid var(--brand);background:var(--brand);color:var(--brand-ink);padding:10px 20px;border-radius:4px;font-weight:600;cursor:pointer}
 .btn:hover{background:var(--brand-dark)}
+.btn.sm{padding:6px 14px;font-size:.95rem}
 .btn.ghost{background:transparent;color:var(--ink);border-color:var(--line)}
-.btn.grey{background:var(--line);border-color:var(--line);color:var(--muted)}
-.btn.quiet{background:transparent;border-color:transparent;color:var(--muted);text-decoration:underline;padding:10px 4px}
+.btn.ghost:hover{background:var(--bg)}
 .btn.teal{background:var(--help);border-color:var(--help)}
+.btn.quiet{background:transparent;border-color:transparent;color:var(--muted);text-decoration:underline;padding:10px 4px}
+.btn:disabled{opacity:.45;cursor:not-allowed}
 
 .toast{position:fixed;right:16px;top:calc(16px + env(safe-area-inset-top,0px));max-width:300px;background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--warn);padding:12px 36px 12px 12px;border-radius:4px;box-shadow:0 6px 24px rgba(0,0,0,.2);z-index:30}
 .toast b{display:block}
 .toast button{position:absolute;right:6px;top:6px;background:none;border:none;font-size:1.2rem;cursor:pointer;color:var(--muted)}
-.cookie{position:fixed;left:0;right:0;bottom:0;background:var(--surface);border-top:1px solid var(--line);box-shadow:0 -6px 24px rgba(0,0,0,.15);padding:16px 20px calc(16px + env(safe-area-inset-bottom,0px));z-index:32}
-.cookie .row{max-width:640px;margin:0 auto;display:flex;gap:12px;flex-wrap:wrap;align-items:center;justify-content:space-between}
-.cookie p{margin:0;max-width:360px;font-size:.95rem}
-.shame{background:none;border:none;color:var(--faint);font-size:.75rem;text-decoration:underline;cursor:pointer}
-.chat{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));width:280px;max-width:calc(100% - 32px);background:var(--surface);border:1px solid var(--line);border-radius:8px;box-shadow:0 8px 28px rgba(0,0,0,.25);z-index:31;overflow:hidden}
-.chat .bar{background:var(--header);color:#fff;padding:10px 12px;display:flex;justify-content:space-between;align-items:center}
-.chat .bar button{background:none;border:none;color:inherit;font-size:1.3rem;cursor:pointer;line-height:1;padding:0 4px}
-.chat .body{padding:14px 12px;min-height:90px}
-.chat .bubble{background:var(--bg);border-radius:10px;padding:8px 10px;display:inline-block}
-
 .overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;padding:16px;z-index:40}
 .modal{position:relative;background:var(--surface);border-radius:6px;padding:22px;max-width:420px;width:100%;border:1px solid var(--line)}
 .modal .x{position:absolute;right:6px;top:4px;background:none;border:none;color:var(--faint);font-size:.72rem;cursor:pointer;padding:2px}
@@ -124,6 +140,8 @@ p{margin:0 0 12px}
 .scale-ends{display:flex;justify-content:space-between;font-size:.85rem;color:var(--muted)}
 .spinner{width:36px;height:36px;border:4px solid var(--line);border-top-color:var(--brand);border-radius:50%;animation:spin 1s linear infinite;margin:8px auto 16px}
 @keyframes spin{to{transform:rotate(360deg)}}
+.queue{text-align:center;padding:30px 10px}
+.queue b{display:block;font-size:3rem;line-height:1;font-variant-numeric:tabular-nums;margin:10px 0}
 
 .stats{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin:14px 0}
 .stat{border:1px solid var(--line);border-radius:6px;padding:12px}
@@ -133,59 +151,72 @@ p{margin:0 0 12px}
 #meter{position:fixed;left:12px;bottom:calc(12px + env(safe-area-inset-bottom,0px));background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:10px 12px;font-size:.8rem;width:220px;z-index:45;box-shadow:0 4px 16px rgba(0,0,0,.15)}
 #meter .m{height:8px;background:var(--bg);border-radius:4px;overflow:hidden;margin:4px 0 6px}
 #meter .m i{display:block;height:100%;background:var(--help);transition:width .4s}
-@media (prefers-reduced-motion:reduce){.spinner{animation-duration:3s}#meter .m i{transition:none}}
+@media (prefers-reduced-motion:reduce){.spinner{animation-duration:3s}.seats.pulse{animation:none}#meter .m i{transition:none}}
 </style>
 </head>
 <body>
 <header class="top">
-  <div class="word">Northeastern University<small>Student Hub</small></div>
+  <div class="word">Northeastern University<small>Student Hub, Registration</small></div>
   <div id="timerSlot"></div>
 </header>
 <main id="app"></main>
-<div id="toastSlot"></div><div id="cookieSlot"></div><div id="chatSlot"></div><div id="intSlot"></div><div id="modalSlot"></div>
+<div id="toastSlot"></div><div id="intSlot"></div><div id="modalSlot"></div>
 <div id="meter" hidden></div>
 
 <script>
 /* ===================== CONFIG ===================== */
 const CONFIG = {
-  SUBMIT_URL: '',          // optional: Google Apps Script URL to collect class results
-  taskSeconds: 180,
-  tickMs: 1500, windowMs: 15000, minKeys: 6,
-  baselineIki: 220,        // no warm-up in the demo, so use a typical typing gap (ms)
+  SUBMIT_URL: '',            // optional Google Apps Script URL
+  windowSeconds: 210,        // "registration window closes in"
+  queueSeconds: 5,
+  tickMs: 1500, windowMs: 15000, minKeys: 6, baselineIki: 220,
   thresholds: { L1:30, L2:50, L3:70 },
-  failsForL1: 1, failsForL2: 2, failsForL3: 3,
-  newsletterAt: 18, chatAt: 32, notifEvery: [16,24], breakSeconds: 15,
+  failsForL1: 1, failsForL2: 2, failsForL3: 4,
+  surveyAt: 25, sessionWarnAt: 80, sessionGrace: 25, notifEvery: [18,26], breakSeconds: 15,
 };
-/* Pattern switches off in the stress-aware version at this level */
-const PATTERNS = { placeholderLabels:1, hiddenFormats:1, vagueErrors:1, dripPassword:1, trickButtons:1,
-  clearOnError:2, noPaste:2, hardCaptcha:2, interruptions:2, layoutShift:2, scrollToAgree:2, slowSubmit:2, reauth:2 };
+const PIN='482917';
+const REQUIRED=['CS 5340','CS 5200','CS 5800'];
 
-const pwRules=[['At least 10 characters',v=>v.length>=10],['An uppercase letter',v=>/[A-Z]/.test(v)],['A number',v=>/\d/.test(v)],['A symbol such as ! or #',v=>/[^A-Za-z0-9\s]/.test(v)],['No spaces',v=>v.length>0&&!/\s/.test(v)]];
-function parseDMY(v){const m=/^(\d{2})\/(\d{2})\/(\d{4})$/.exec(String(v).trim());if(!m)return null;const d=+m[1],mo=+m[2],y=+m[3];const t=new Date(y,mo-1,d);return t.getFullYear()===y&&t.getMonth()===mo-1&&t.getDate()===d?t:null;}
-const fmt={ nuid:v=>v.replace(/\D/g,'').slice(0,9), date:v=>{const d=v.replace(/\D/g,'').slice(0,8);return d.length>4?d.slice(0,2)+'/'+d.slice(2,4)+'/'+d.slice(4):d.length>2?d.slice(0,2)+'/'+d.slice(2):d;} };
+/* Friction that eases in the stress-aware version (level at which it eases).
+   Required work never disappears: every version still needs 3 courses and the same details. */
+const FRICTION = {
+  strictSearch:1,   // explain: search only works with an exact code like "CS 5340"
+  vagueErrors:1,    // explain: generic errors with codes instead of what went wrong
+  hiddenConflicts:1,// explain: time conflicts only revealed at submit
+  hiddenFormats:1,  // explain: date / NUID formats not shown
+  strictInput:2,    // forgive: "3/7/2003" or spaces rejected instead of fixed
+  wipeOnError:2,    // protect: PIN cleared after a failed attempt
+  maskedPin:2,      // forgive: PIN hidden and paste blocked
+  noFixes:2,        // forgive: no one-click alternative when a class fails
+  noise:2,          // calm: pop-ups, survey, notifications, session warning
+  seatPressure:2,   // calm: pulsing "only 2 left", seats in your cart can vanish
+  slowSubmit:2,     // calm: long "don't press back" spinner
+};
 
-const STEPS=[
-  {title:'Your details', fields:[
-    {id:'name',label:'Full legal name',ph:'Name',hint:'Last name, comma, first name. Example: Patil, Aarya',msg:'Write it as Last, First with a comma between.',ok:v=>/^[A-Za-z][A-Za-z' -]*,\s*[A-Za-z][A-Za-z' -]*$/.test(v.trim())},
-    {id:'nuid',label:'NUID',ph:'NUID',hint:'9 digits starting with 00. Example: 001234567',msg:'NUID is 9 digits and starts with 00.',fmt:'nuid',ok:v=>/^00\d{7}$/.test(v)},
-    {id:'dob',label:'Date of birth',ph:'Date of birth',hint:'Day first: DD/MM/YYYY. Example: 04/09/2003',msg:'Use DD/MM/YYYY with the day first.',fmt:'date',ok:v=>{const d=parseDMY(v);if(!d)return false;const a=(Date.now()-d)/3.156e10;return a>=16&&a<=90;}},
-    {id:'email',label:'Northeastern email',ph:'Email',hint:'Must end in @northeastern.edu',msg:'Use an address ending in @northeastern.edu.',ok:v=>/^[A-Za-z0-9._%+-]+@northeastern\.edu$/i.test(v.trim())},
-    {id:'email2',label:'Confirm email',ph:'Confirm email',noPaste:true,clear:true,msg:'The two email addresses don\u2019t match.',ok:(v,V)=>v.trim().length>0&&v.trim().toLowerCase()===String(V.email||'').trim().toLowerCase()},
-  ]},
-  {title:'Finish', fields:[
-    {id:'pw',label:'Create a password',ph:'Password',type:'password',clear:true,msg:'Password is missing one or more requirements.',ok:v=>pwRules.every(r=>r[1](v))},
-    {id:'pw2',label:'Confirm password',ph:'Confirm password',type:'password',noPaste:true,clear:true,msg:'The two passwords don\u2019t match.',ok:(v,V)=>v.length>0&&v===V.pw},
-    {id:'code',label:'Type the verification code',ph:'Code',type:'code',clear:true,msg:'Code doesn\u2019t match. Letters are case-sensitive.'},
-    {id:'terms',label:'I agree to the Student Hub terms of use',type:'terms',msg:'Tick the box to agree to the terms.'},
-  ]},
+/* ===================== Catalog ===================== */
+const C=(code,title,secs)=>({code,title,secs:secs.map(s=>({...s,id:code+'-'+s.sec}))});
+const CATALOG=[
+  C('CS 5520','Mobile Application Development',[{sec:'01',days:['Tue','Fri'],s:'09:50',e:'11:30',seats:18}]),
+  C('CS 5800','Algorithms',[{sec:'01',days:['Mon','Thu'],s:'11:45',e:'13:25',seats:6},{sec:'02',days:['Mon','Wed'],s:'16:35',e:'18:15',seats:11}]),
+  C('CS 5310','Computer Graphics',[{sec:'01',days:['Wed'],s:'18:00',e:'21:15',seats:25}]),
+  C('CS 5200','Database Management Systems',[{sec:'01',days:['Tue','Fri'],s:'13:35',e:'15:15',seats:9},{sec:'02',days:['Wed'],s:'18:00',e:'21:15',seats:22}]),
+  C('DS 5110','Introduction to Data Management and Processing',[{sec:'01',days:['Mon','Thu'],s:'13:35',e:'15:15',seats:16}]),
+  C('CS 5340','Human-Computer Interaction',[{sec:'01',days:['Mon','Thu'],s:'11:45',e:'13:25',seats:2},{sec:'02',days:['Tue','Fri'],s:'13:35',e:'15:15',seats:14}]),
+  C('CS 5100','Foundations of Artificial Intelligence',[{sec:'01',days:['Tue','Fri'],s:'11:45',e:'13:25',seats:3}]),
+  C('CS 5330','Pattern Recognition and Computer Vision',[{sec:'01',days:['Mon','Wed'],s:'14:50',e:'16:30',seats:12}]),
+  C('CS 6120','Natural Language Processing',[{sec:'01',days:['Thu'],s:'18:00',e:'21:15',seats:20}]),
 ];
-const NOTIFS=[['Canvas','New announcement in CS 5340.'],['Outlook','You have 12 unread emails.'],['Student Hub','Your session will expire soon.'],['Financial Services','A new e-bill is available.']];
+const ALIASES={'hci':'CS 5340','human computer interaction':'CS 5340','dbms':'CS 5200','database':'CS 5200','databases':'CS 5200','db':'CS 5200','algo':'CS 5800','algos':'CS 5800','algorithm':'CS 5800','algorithms':'CS 5800','ai':'CS 5100','nlp':'CS 6120'};
+const SECS=CATALOG.flatMap(c=>c.secs.map(s=>({...s,code:c.code,title:c.title})));
+const t12=x=>{let [h,m]=x.split(':').map(Number);const ap=h>=12?'pm':'am';h=h%12||12;return `${h}:${String(m).padStart(2,'0')} ${ap}`;};
+const when=s=>`${s.days.join(', ')} ${t12(s.s)} to ${t12(s.e)}`;
+const mins=x=>{const [h,m]=x.split(':').map(Number);return h*60+m;};
+const overlap=(a,b)=>a.days.some(d=>b.days.includes(d))&&mins(a.s)<mins(b.e)&&mins(b.s)<mins(a.e);
 
 /* ===================== Helpers ===================== */
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const now=()=>performance.now(), clamp=(x,a=0,b=1)=>Math.max(a,Math.min(b,x)), mean=a=>a.length?a.reduce((s,x)=>s+x,0)/a.length:0, rand=(a,b)=>a+Math.random()*(b-a);
-function genCode(easy){const set=easy?'ACDEFHJKMNPRTUVWXY3479':'O0oIl1iB8S5Z2Qq9g';let s='';for(let i=0;i<6;i++)s+=set[Math.floor(Math.random()*set.length)];return s;}
 const params=new URLSearchParams(location.search);
 let showMeter=params.get('meter')==='1';
 let T=null;
@@ -193,7 +224,6 @@ let T=null;
 /* ===================== Tracking (timing only) ===================== */
 const track={keys:[],mouse:[],clicks:[],last:null,lastDx:0,on:false};
 document.addEventListener('keydown',e=>{
-  if(e.shiftKey&&e.key==='M'&&!(e.target.matches&&e.target.matches('input'))){showMeter=!showMeter;$('#meter').hidden=!showMeter||!T;return;}
   if(!track.on||e.ctrlKey||e.metaKey||e.altKey)return;
   const bs=e.key==='Backspace'||e.key==='Delete';if(bs||e.key.length===1)track.keys.push({t:now(),bs});
 },true);
@@ -207,47 +237,64 @@ document.addEventListener('pointerdown',e=>{
   if(track.clicks.filter(k=>c.t-k.t<800&&Math.hypot(k.x-c.x,k.y-c.y)<30).length>=3&&T&&!T.outcome)T.rage.push(c.t);
 },true);
 
-/* ===================== Start screen ===================== */
-function home(){
-  T=null;track.on=false;$('#timerSlot').innerHTML='';$('#meter').hidden=true;
-  const v=params.get('v'); if(v==='frustrating'||v==='adaptive'){params.delete('v');return start(v);}
+/* ===================== Hub ===================== */
+function hub(){
+  T=null;track.on=false;$('#timerSlot').innerHTML='';$('#meter').hidden=true;$('#intSlot').innerHTML='';$('#toastSlot').innerHTML='';
+  const v=params.get('v');if(v==='frustrating'||v==='adaptive'){params.delete('v');return queue(v);}
   $('#app').innerHTML=`<div class="panel">
-    <h1>Can a form notice you\u2019re stressed?</h1>
-    <p>Fill in a short (fake) Northeastern Student Hub form. It\u2019s built to be annoying. Use made-up details. We only measure typing and mouse timing, never what you type.</p>
-    <div class="choose">
-      <button class="choice" data-v="frustrating"><b>Frustrating version</b><span>Every bad pattern stays on, the whole time.</span></button>
-      <button class="choice alt" data-v="adaptive"><b>Stress-aware version</b><span>Starts the same, then eases up when it senses frustration.</span></button>
+    <h1>Can an interface notice you\u2019re stressed?</h1>
+    <p>Two short demos from our HCI project. Each has a regular version and a stress-aware version that notices frustration from how you type, click and move, then eases up without skipping any steps. We only measure timing, never what you type. Use made-up details.</p>
+    <div class="hubgrid">
+      <div class="demo"><h2>Spring 2027 course registration</h2><p class="muted" style="margin:0">Get three courses before the registration window closes. About 2 minutes.</p>
+        <div class="row"><button class="btn" data-go="frustrating">Regular version</button><button class="btn teal" data-go="adaptive">Stress-aware version</button></div></div>
+      <div class="demo"><h2>Team group chat</h2><p class="muted" style="margin:0">Your project is due tonight and a teammate hasn\u2019t sent their part. Message them and see how it lands. About 1 minute.</p>
+        <div class="row"><a class="btn" href="chat.html?m=standard" style="text-decoration:none">Regular chat</a><a class="btn teal" href="chat.html?m=aware" style="text-decoration:none">Stress-aware chat</a></div></div>
     </div>
-    <div class="check" style="margin-top:10px"><input type="checkbox" id="mChk" ${showMeter?'checked':''}><label for="mChk">Show the live stress meter</label></div>
+    <div class="check" style="margin-top:16px"><input type="checkbox" id="mChk" ${showMeter?'checked':''}><label for="mChk">Show the live stress meter</label></div>
   </div>
-  <p class="disclaim">Git Girls, HCI class prototype. Not an official Northeastern University page. About 2 minutes.</p>`;
-  document.querySelectorAll('.choice').forEach(b=>b.onclick=()=>{showMeter=$('#mChk').checked;start(b.dataset.v);});
+  <p class="disclaim">Git Girls, Northeastern HCI class prototype. Not an official Northeastern University page.</p>`;
+  $('#mChk').onchange=e=>{showMeter=e.target.checked;};
+  document.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>queue(b.dataset.go));
+  document.querySelectorAll('a[href^="chat.html"]').forEach(a=>a.onclick=()=>{if(showMeter)a.href+='&meter=1';});
+}
+function queue(cond){
+  let s=CONFIG.queueSeconds,pos=214;
+  $('#app').innerHTML=`<div class="panel queue"><p>You\u2019re in the registration queue.</p><b id="qp">#${pos}</b><p class="muted">Don\u2019t refresh this page or you\u2019ll lose your place in line.</p></div>`;
+  const iv=setInterval(()=>{s--;pos=Math.max(1,Math.round(pos*.45));const q=$('#qp');if(q)q.textContent='#'+pos;if(s<=0){clearInterval(iv);start(cond);}},1000);
 }
 
-/* ===================== Task ===================== */
-function on(p){return !(T&&T.cond==='adaptive'&&T.level>=PATTERNS[p]&&!T.disabled[PATTERNS[p]]);}
+/* ===================== Task runtime ===================== */
+function on(p){return !(T&&T.cond==='adaptive'&&T.level>=FRICTION[p]&&!T.disabled[FRICTION[p]]);}
 function start(cond){
   track.keys=[];track.mouse=[];track.clicks=[];track.last=null;track.on=true;
-  T={cond,step:0,values:{},touched:{},code:genCode(false),easy:false,level:0,disabled:{},levels:[],rage:[],fails:[],errors:0,
-     interrupts:0,peak:0,scores:[],breakOffered:false,breakTaken:false,paused:false,pausedMs:0,pauseStart:0,t0:now(),last:now(),
-     remaining:CONFIG.taskSeconds*1000,shown:{},termsRead:false,cleared:0,outcome:null,showErrors:false,invalid:[],modal:false,
-     nextNotif:now()+rand(...CONFIG.notifEvery)*1000};
+  T={cond,step:0,query:'',results:null,cart:[],seats:Object.fromEntries(SECS.map(s=>[s.id,s.seats])),values:{},touched:{},
+     level:0,disabled:{},levels:[],rage:[],fails:[],half:[],emptySearches:0,errors:0,interrupts:0,peak:0,showPin:false,
+     breakOffered:false,breakTaken:false,paused:false,pausedMs:0,pauseStart:0,t0:now(),last:now(),remaining:CONFIG.windowSeconds*1000,
+     shown:{},outcome:null,banner:null,invalid:[],modal:false,nextNotif:now()+rand(...CONFIG.notifEvery)*1000,nextSeat:now()+3500,regFails:0};
   $('#meter').hidden=!showMeter;
   T.timer=setInterval(tick,250);T.scorer=setInterval(score,CONFIG.tickMs);
   render();
-  if(on('interruptions'))cookie();
 }
 const elapsed=()=>(now()-T.t0-T.pausedMs-(T.paused?now()-T.pauseStart:0))/1000;
 function pause(v){if(v&&!T.paused){T.paused=true;T.pauseStart=now();}else if(!v&&T.paused){T.paused=false;T.pausedMs+=now()-T.pauseStart;T.last=now();}}
+const held=id=>!on('seatPressure')&&T.cart.includes(id);
 function tick(){
-  if(T.outcome)return;const t=now();if(!T.paused)T.remaining-=t-T.last;T.last=t;
+  if(T.outcome)return;const t=now();const calm=!on('seatPressure');
+  if(!T.paused&&!calm)T.remaining-=t-T.last;T.last=t;
   const s=Math.max(0,Math.ceil(T.remaining/1000));
-  $('#timerSlot').innerHTML=`<div class="timer ${s<=30?'low':''}" aria-label="Time remaining">${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}</div>`;
+  $('#timerSlot').innerHTML=calm?`<div class="timer held">Your seats are held for 15:00</div>`:`<div class="timer ${s<=45?'low':''}">Window closes in <b>${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}</b></div>`;
   if(T.remaining<=0)return finish('timeout');
-  if(T.paused||T.modal||!on('interruptions'))return;
+  if(T.paused)return;
+  // seats drain over time; CS 5340-01 always fills up after ~30 s
+  if(t>T.nextSeat){T.nextSeat=t+rand(3000,6000);
+    const pool=SECS.filter(x=>T.seats[x.id]>0&&!held(x.id));const pick=pool[Math.floor(Math.random()*pool.length)];if(pick)T.seats[pick.id]--;
+    if(elapsed()>30&&!held('CS 5340-01'))T.seats['CS 5340-01']=0;
+    if(T.step===0&&!T.modal)refreshSeats();
+  }
+  if(T.modal||!on('noise'))return;
   const e=elapsed();
-  if(e>CONFIG.newsletterAt&&!T.shown.nl)newsletter();
-  else if(e>CONFIG.chatAt&&!T.shown.chat)chat();
+  if(e>CONFIG.surveyAt&&!T.shown.survey)survey();
+  else if(e>CONFIG.sessionWarnAt&&!T.shown.session)sessionWarn();
   else if(t>T.nextNotif){T.nextNotif=t+rand(...CONFIG.notifEvery)*1000;notif();}
 }
 function score(){
@@ -256,151 +303,237 @@ function score(){
   const ks=track.keys.filter(k=>k.t>=from);const iki=[];for(let i=1;i<ks.length;i++){const g=ks[i].t-ks[i-1].t;if(g<2000)iki.push(g);}
   const ms=track.mouse.filter(m=>m.t>=from),dist=ms.reduce((s,m)=>s+m.d,0),flips=ms.reduce((s,m)=>s+m.f,0);
   const typing=ks.length>=CONFIG.minKeys&&iki.length?clamp((CONFIG.baselineIki/mean(iki)-1)/.6):0;
-  const bsr=ks.length>=CONFIG.minKeys?ks.filter(k=>k.bs).length/ks.length:0, back=clamp((bsr-.08)/.25);
-  const jit=dist>150?flips/(dist/100):0, mouse=clamp((jit-1)/1.5);
-  const fails=clamp((T.fails.filter(x=>x>=from).length+.5*T.rage.filter(x=>x>=from).length)*.5);
-  const sc=Math.round(100*(.25*typing+.25*back+.2*mouse+.3*fails));
-  T.scores.push(sc);T.peak=Math.max(T.peak,sc);
-  if(showMeter)$('#meter').innerHTML=`<b>Stress score ${sc}</b> <span class="muted">level ${T.level}</span><div class="m"><i style="width:${sc}%"></i></div>typing ${typing.toFixed(1)}, deleting ${back.toFixed(1)}<br>mouse ${mouse.toFixed(1)}, failed submits ${fails.toFixed(1)}`;
+  const bsr=ks.length>=CONFIG.minKeys?ks.filter(k=>k.bs).length/ks.length:0,back=clamp((bsr-.08)/.25);
+  const jit=dist>150?flips/(dist/100):0,mouse=clamp((jit-1)/1.5);
+  const fails=clamp((T.fails.filter(x=>x>=from).length+.5*T.half.filter(x=>x>=from).length+.5*T.rage.filter(x=>x>=from).length)*.5);
+  const sc=Math.round(100*(.25*typing+.25*back+.2*mouse+.3*fails));T.peak=Math.max(T.peak,sc);
+  if(showMeter)$('#meter').innerHTML=`<b>Stress score ${sc}</b> <span class="muted">level ${T.level}</span><div class="m"><i style="width:${sc}%"></i></div>typing ${typing.toFixed(1)}, deleting ${back.toFixed(1)}<br>mouse ${mouse.toFixed(1)}, setbacks ${fails.toFixed(1)}`;
   if(T.cond!=='adaptive'||elapsed()<8)return;
   const th=CONFIG.thresholds;raise(sc>=th.L3?3:sc>=th.L2?2:sc>=th.L1?1:0,'score');
+}
+function setback(w=1){ // failed continue/registration = 1, empty search = 0.5
+  if(w>=1)T.fails.push(now());else T.half.push(now());
+  const n=T.fails.length+.5*T.half.length;raise(n>=CONFIG.failsForL3?3:n>=CONFIG.failsForL2?2:n>=CONFIG.failsForL1?1:0,'setbacks');
 }
 function raise(want,why){
   if(T.cond!=='adaptive'||T.outcome)return;
   if(want>=3&&T.breakOffered)want=2;
   if(want<=T.level)return;
-  T.level=want;T.levels.push({level:want,why,at:+elapsed().toFixed(1)});
-  if(want>=2){quiet();if(!T.easy){T.easy=true;T.code=genCode(true);}}
+  T.level=want;T.levels.push({level:want,why,at:Math.round(elapsed())});
+  if(want>=2)quiet();
+  if(T.step===0&&T.query)T.results=find(T.query);
+  if(T.banner)T.banner=buildBanner(T.banner.raw);
   render(true);
   if(want===3)offerBreak();
 }
 
-/* ===================== Render ===================== */
-const pwList=v=>pwRules.map(r=>`<li class="${r[1](v)?'ok':'no'}">${r[1](v)?'\u2713':'\u2022'} ${r[0]}</li>`).join('');
-function fieldHTML(f){
-  const v=T.values[f.id]??'',ph=on('placeholderLabels');
-  const bad=T.showErrors&&T.invalid.includes(f.id);
-  const good=!on('vagueErrors')&&T.touched[f.id]&&!bad&&String(v).length>0&&valid(f);
-  const err=bad&&!on('vagueErrors')?`<div class="err">${esc(f.msg)}</div>`:'';
-  const hint=!on('hiddenFormats')&&f.hint?`<div class="hint">${esc(f.hint)}</div>`:'';
-  const cls=`field ${bad?'bad':''} ${good?'good':''}`;
-  if(f.type==='terms'){
-    const locked=on('scrollToAgree')&&!T.termsRead;
-    return `<div class="${cls}"><span class="lbl">Terms of use</span><div class="terms" id="termsBox" tabindex="0">${TERMS}</div>
-      <div class="check"><input type="checkbox" id="f_terms" data-f="terms" ${v===true?'checked':''} ${locked?'disabled':''}><label for="f_terms">${esc(f.label)}</label></div>${err}</div>`;
+/* ===================== Search & cart ===================== */
+function find(q){
+  const raw=q.trim();if(!raw)return null;
+  if(on('strictSearch')){
+    const u=raw.toUpperCase();
+    if(/^(CS|DS)$/.test(u))return CATALOG.filter(c=>c.code.startsWith(u));
+    const c=CATALOG.find(c=>c.code===u);return c?[c]:[];
   }
-  const lab=ph?'':`<label for="f_${f.id}">${esc(f.label)}</label>`;
-  let input=`<input type="${f.type==='password'?'password':'text'}" id="f_${f.id}" data-f="${f.id}" value="${esc(v)}" autocomplete="off" spellcheck="false" ${ph?`placeholder="${esc(f.ph)}" aria-label="${esc(f.label)}"`:''}>`;
-  let extra='';
-  if(f.type==='code'){const hard=on('hardCaptcha');input=`<div class="codebox ${hard?'':'easy'}" aria-label="Verification code">${esc(T.code)}</div>`+input;
-    extra=hard?(on('hiddenFormats')?'':'<div class="hint">Case-sensitive. 0 is zero, O is the letter.</div>'):'<div class="hint">Capital or lowercase both work.</div>';}
-  if(f.id==='pw'&&!on('dripPassword'))extra=`<ul class="pwlist" id="pwlist">${pwList(String(v))}</ul>`;
-  return `<div class="${cls}">${lab}${input}${hint}${extra}${err}</div>`;
+  const n=raw.toLowerCase().replace(/[^a-z0-9 ]/g,' ').replace(/\s+/g,' ').trim(),compact=n.replace(/ /g,'');
+  if(ALIASES[n])return CATALOG.filter(c=>c.code===ALIASES[n]);
+  const hits=CATALOG.filter(c=>c.code.toLowerCase().replace(' ','')===compact||c.code.slice(3)===compact||compact.includes(c.code.slice(3))||c.title.toLowerCase().includes(n));
+  return hits.sort((a,b)=>a.code.localeCompare(b.code));
 }
-function valid(f){
-  const v=T.values[f.id];
-  if(f.type==='code')return on('hardCaptcha')?String(v||'').trim()===T.code:String(v||'').trim().toLowerCase()===T.code.toLowerCase();
-  if(f.type==='terms')return v===true;
-  return !!f.ok(String(v||''),T.values);
+function conflictsOf(id){const a=SECS.find(x=>x.id===id);return T.cart.filter(c=>c!==id).map(c=>SECS.find(x=>x.id===c)).filter(b=>overlap(a,b));}
+function seatsHTML(id){
+  const n=T.seats[id];if(held(id))return `<span class="tag held">Seat held</span>`;
+  if(n<=0)return `<span class="seats low">Full</span>`;
+  const press=on('seatPressure')&&n<=5;
+  return `<span class="seats ${press?'low pulse':''}" data-seat="${id}">${press?`Only ${n} left!`:`${n} seats open`}</span>`;
+}
+function resultsHTML(){
+  if(T.results===null)return `<div class="empty">${on('strictSearch')?'Enter a subject and course number.':'Search by course code (CS 5340), number (5340) or name (HCI).'}</div>`;
+  if(!T.results.length)return `<div class="empty">No classes found. Refine your search criteria.</div>`;
+  const list=on('strictSearch')?T.results:T.results;
+  return list.map(c=>`<div class="course"><div class="ch">${esc(c.code)} <span>${esc(c.title)}</span></div>
+    ${c.secs.map(s=>{const inCart=T.cart.includes(s.id),full=T.seats[s.id]<=0&&!held(s.id);
+      const cf=!on('hiddenConflicts')&&!inCart?SECS.filter(x=>T.cart.includes(x.id)).filter(b=>overlap({...s},b)):[];
+      return `<div class="sec"><div><div class="when">Section ${s.sec}: ${when(s)}${cf.length?`<span class="tag bad">Conflicts with ${esc(cf[0].code)}</span>`:''}</div><div id="seat_${s.id.replace(/\W/g,'')}">${seatsHTML(s.id)}</div></div>
+      <button class="btn sm ${inCart?'ghost':''}" data-add="${s.id}" ${full&&!inCart?'disabled':''}>${inCart?'In cart':full?'Full':'Add'}</button></div>`;}).join('')}</div>`).join('');
+}
+function cartHTML(){
+  return `<div class="cart"><h2><span>Your cart</span><span class="muted" style="font-weight:400">${T.cart.length} of 3</span></h2>
+    ${T.cart.length?T.cart.map(id=>{const s=SECS.find(x=>x.id===id),cf=!on('hiddenConflicts')?conflictsOf(id):[];
+      return `<div class="citem"><div><b>${esc(s.code)}</b> ${esc(s.title)}<small>Section ${s.sec}, ${when(s)}${cf.length?` <span class="tag bad">Time conflict with ${esc(cf.map(x=>x.code).join(', '))}</span>`:''}${held(id)?' <span class="tag held">Seat held</span>':''}</small></div><button class="btn sm ghost" data-rm="${id}">Remove</button></div>`;}).join(''):'<p class="muted">Nothing here yet.</p>'}</div>`;
+}
+function refreshSeats(){SECS.forEach(s=>{const el=document.getElementById('seat_'+s.id.replace(/\W/g,''));if(el)el.innerHTML=seatsHTML(s.id);});
+  document.querySelectorAll('[data-add]').forEach(b=>{const id=b.dataset.add;if(!T.cart.includes(id)&&T.seats[id]<=0&&!held(id)){b.disabled=true;b.textContent='Full';}});}
+
+/* ===================== Details fields ===================== */
+const FIELDS=[
+  {id:'first',label:'First name',ok:v=>/^[A-Za-z][A-Za-z' -]*$/.test(v.trim()),msg:'Enter your first name using letters only.'},
+  {id:'last',label:'Last name',ok:v=>/^[A-Za-z][A-Za-z' -]*$/.test(v.trim()),msg:'Enter your last name using letters only.'},
+  {id:'nuid',label:'NUID',hint:'9 digits starting with 00, e.g. 001234567',msg:'Your NUID is 9 digits and starts with 00.',ok:v=>/^00\d{7}$/.test(v),fix:v=>v.replace(/\D/g,'')},
+  {id:'dob',label:'Date of birth',hint:'MM/DD/YYYY, e.g. 03/07/2003',msg:'Use MM/DD/YYYY, with two digits for month and day.',ok:v=>{const m=/^(\d{2})\/(\d{2})\/(\d{4})$/.exec(v);if(!m)return false;const d=new Date(+m[3],+m[1]-1,+m[2]);return d.getMonth()===+m[1]-1&&d.getDate()===+m[2]&&+m[3]>1930&&+m[3]<2011;},
+    fix:v=>{const m=/^\s*(\d{1,2})\D+(\d{1,2})\D+(\d{2}|\d{4})\s*$/.exec(v);if(!m)return v;let y=m[3];if(y.length===2)y=(+y>30?'19':'20')+y;return `${m[1].padStart(2,'0')}/${m[2].padStart(2,'0')}/${y}`;}},
+  {id:'email',label:'Northeastern email',hint:'Ends in @northeastern.edu',msg:'Use your @northeastern.edu address.',ok:v=>/^[A-Za-z0-9._%+-]+@northeastern\.edu$/i.test(v),fix:v=>v.trim()},
+  {id:'pin',label:'Registration PIN',hint:'The 6-digit PIN from your advisor (shown in your task card)',msg:'That PIN doesn\u2019t match. It\u2019s the 6 digits in your task card.',ok:v=>v===PIN,fix:v=>v.replace(/\D/g,'')},
+];
+function fieldHTML(f){
+  const v=T.values[f.id]??'',bad=T.invalid.includes(f.id),explain=!on('vagueErrors');
+  const good=explain&&T.touched[f.id]&&!bad&&v&&f.ok(v);
+  const hint=!on('hiddenFormats')&&f.hint?`<div class="hint">${esc(f.hint)}</div>`:'';
+  const err=bad&&explain?`<div class="err">${esc(f.msg)}</div>`:'';
+  let input=`<input type="text" id="f_${f.id}" data-f="${f.id}" value="${esc(v)}" autocomplete="off" spellcheck="false">`;
+  if(f.id==='pin'){
+    const mask=on('maskedPin')||!T.showPin;
+    input=`<div class="pinrow"><input type="${mask?'password':'text'}" id="f_pin" data-f="pin" value="${esc(v)}" autocomplete="off" inputmode="numeric">${on('maskedPin')?'':`<button type="button" class="btn sm ghost" id="pinShow">${T.showPin?'Hide':'Show'}</button>`}</div>`;
+  }
+  return `<div class="field ${bad?'bad':''} ${good?'good':''}"><label for="f_${f.id}">${esc(f.label)}</label>${input}${hint}${err}</div>`;
+}
+
+/* ===================== Render ===================== */
+function taskCard(){return `<div class="task"><b>Your task</b>Register for these three Spring 2027 courses:<ul><li>CS 5340 Human-Computer Interaction</li><li>CS 5200 Database Management Systems</li><li>CS 5800 Algorithms</li></ul>Your registration PIN is <span class="pin">${PIN}</span>. Use a made-up name and NUID.</div>`;}
+function notes(){
+  const n=[];
+  if(T.cond==='adaptive'&&T.level>=1&&!T.disabled[1])n.push([1,'We\u2019re showing clearer messages, format examples and time-conflict warnings.']);
+  if(T.cond==='adaptive'&&T.level>=2&&!T.disabled[2])n.push([2,'We\u2019re holding the seats in your cart, pausing pop-ups, and fixing formats for you.']);
+  return n.map(x=>`<div class="adapt" role="status"><span>${x[1]}</span><button data-undo="${x[0]}">Undo</button></div>`).join('');
 }
 function render(keep){
   const a=document.activeElement,aid=a&&a.id,caret=a&&a.selectionStart;
-  const st=STEPS[T.step],last=T.step===STEPS.length-1,trick=on('trickButtons');
-  const notes=[];
-  if(T.cond==='adaptive'&&T.level>=1&&!T.disabled[1])notes.push([1,'We added labels, examples and clearer messages.']);
-  if(T.cond==='adaptive'&&T.level>=2&&!T.disabled[2])notes.push([2,'We simplified the form and paused pop-ups.']);
-  let banner='';
-  if(T.showErrors&&T.invalid.length){
-    if(on('vagueErrors')){let x='';if(T.invalid.includes('pw')&&on('dripPassword')){const r=pwRules.find(r=>!r[1](String(T.values.pw||'')));if(r)x=` Password requirement: ${r[0].toLowerCase()}.`;}
-      banner=`<div class="banner" role="alert">There was a problem with your submission.${esc(x)}</div>`;}
-    else banner=`<div class="banner" role="alert">${T.invalid.length} field${T.invalid.length>1?'s need':' needs'} fixing. Each one says what to change.</div>`;
+  const steps=['Choose courses','Your details','Review and register'];
+  let body='';
+  if(T.step===0){
+    body=`<form class="search" id="sform" onsubmit="return false"><input type="text" id="q" value="${esc(T.query)}" placeholder="${on('strictSearch')?'Subject and number':'e.g. CS 5340, 5340 or HCI'}" aria-label="Search courses" autocomplete="off"><button class="btn" id="go">Search</button></form>
+      <div id="results">${resultsHTML()}</div><div id="cartBox">${cartHTML()}</div>
+      <div class="actions"><button class="btn quiet" id="quit">Stop</button><button class="btn" id="next">Continue</button></div>`;
+  } else if(T.step===1){
+    body=`<form id="frm" novalidate onsubmit="return false"><div class="grid2">${FIELDS.slice(0,2).map(fieldHTML).join('')}</div>${FIELDS.slice(2).map(fieldHTML).join('')}</form>
+      <div class="actions"><div><button class="btn ghost" id="back">Back</button> <button class="btn quiet" id="quit">Stop</button></div><button class="btn" id="next">Continue</button></div>`;
+  } else {
+    body=`<p>You\u2019re registering for:</p>${T.cart.map(id=>{const s=SECS.find(x=>x.id===id);return `<div class="citem"><div><b>${esc(s.code)}</b> ${esc(s.title)}<small>Section ${s.sec}, ${when(s)}</small></div></div>`;}).join('')}
+      <div class="check" style="margin-top:14px"><input type="checkbox" id="ack" ${T.values.ack?'checked':''}><label for="ack">I understand I\u2019m responsible for tuition and fees for these courses.</label></div>
+      <div class="actions"><div><button class="btn ghost" id="back">Back</button> <button class="btn quiet" id="quit">Stop</button></div><button class="btn" id="next">Register</button></div>`;
   }
-  const nextBtn=`<button class="btn ${last&&trick?'grey':''}" id="next">${last?'Submit':'Continue'}</button>`;
-  const right=last&&trick?`<button class="btn" id="clear">Clear form</button>`:nextBtn;
-  const left=[T.step>0?'<button class="btn ghost" id="back">Back</button>':'',last&&trick?nextBtn:'','<button class="btn quiet" id="quit">Stop</button>'].join(' ');
-  $('#app').innerHTML=`<div class="panel">
-    <h1>Update your student profile</h1>
-    <ol class="steps">${STEPS.map((s,i)=>`<li class="${i===T.step?'on':i<T.step?'done':''}">Step ${i+1} of ${STEPS.length}: ${esc(s.title)}</li>`).join('')}</ol>
-    ${notes.map(n=>`<div class="adapt" role="status"><span>${n[1]}</span><button data-undo="${n[0]}">Undo</button></div>`).join('')}
-    ${banner}
-    <form id="frm" novalidate onsubmit="return false">${st.fields.map(fieldHTML).join('')}</form>
-    <div id="shiftSlot"></div>
-    <div class="actions"><div>${left}</div>${right}</div></div>`;
+  $('#app').innerHTML=`<div class="panel">${taskCard()}
+    <h1>${['Find your courses','Confirm your details','Review and register'][T.step]}</h1>
+    <ol class="steps">${steps.map((s,i)=>`<li class="${i===T.step?'on':i<T.step?'done':''}">${i+1}. ${s}</li>`).join('')}</ol>
+    ${notes()}${T.banner?T.banner.html:''}${body}</div>`;
   wire();
-  if(last&&on('layoutShift'))setTimeout(()=>{if(T&&!T.outcome&&on('layoutShift')&&$('#shiftSlot')&&!$('#shiftSlot').innerHTML){$('#shiftSlot').innerHTML='<div class="promo"><b>Husky Card offer!</b>Add $50 in dining dollars and get $5 free.</div>';T.interrupts++;}},1200);
   if(keep&&aid){const el=document.getElementById(aid);if(el){el.focus();try{if(caret!=null)el.setSelectionRange(caret,caret);}catch(e){}}}
 }
 function wire(){
-  const frm=$('#frm');
-  frm.addEventListener('input',onInput);frm.addEventListener('change',onInput);
-  frm.addEventListener('focusout',e=>{const id=e.target.dataset&&e.target.dataset.f;if(id&&id!=='terms'&&!on('vagueErrors')){T.touched[id]=true;redraw(id);}});
-  frm.addEventListener('paste',e=>{const f=fld(e.target.dataset&&e.target.dataset.f);if(f&&f.noPaste&&on('noPaste'))e.preventDefault();});
-  $('#next').onclick=submit;
-  if($('#clear'))$('#clear').onclick=clearAll;
-  if($('#back'))$('#back').onclick=()=>{T.step--;T.showErrors=false;T.invalid=[];render();};
+  document.querySelectorAll('[data-undo]').forEach(b=>b.onclick=()=>{T.disabled[+b.dataset.undo]=true;if(T.query)T.results=find(T.query);if(T.banner)T.banner=buildBanner(T.banner.raw);render();});
   $('#quit').onclick=()=>finish('stopped');
-  if($('#termsBox'))$('#termsBox').addEventListener('scroll',e=>{const b=e.target;if(b.scrollTop+b.clientHeight>=b.scrollHeight-4){T.termsRead=true;const c=$('#f_terms');if(c)c.disabled=false;}});
-  document.querySelectorAll('[data-undo]').forEach(b=>b.onclick=()=>{T.disabled[+b.dataset.undo]=true;render();});
-}
-const fld=id=>id&&STEPS[T.step].fields.find(x=>x.id===id);
-function redraw(id){const f=fld(id),el=document.getElementById('f_'+id);if(!f||!el)return;const w=el.closest('.field'),d=document.createElement('div');d.innerHTML=fieldHTML(f);if(w&&d.firstElementChild)w.replaceWith(d.firstElementChild);}
-function onInput(e){
-  const el=e.target,id=el.dataset&&el.dataset.f;if(!id)return;
-  if(el.type==='checkbox'){T.values[id]=el.checked;return;}
-  const f=fld(id);let v=el.value;
-  if(!on('clearOnError')&&f.fmt&&e.type==='input'){const n=fmt[f.fmt](v);if(n!==v){el.value=n;v=n;}}
-  T.values[id]=v;if(id==='pw'&&$('#pwlist'))$('#pwlist').innerHTML=pwList(v);
-}
-function submit(){
-  const st=STEPS[T.step];T.invalid=st.fields.filter(f=>!valid(f)).map(f=>f.id);
-  if(T.invalid.length){
-    T.fails.push(now());T.errors+=T.invalid.length;T.showErrors=true;
-    if(on('clearOnError')){st.fields.forEach(f=>{if(f.clear)T.values[f.id]='';});if(T.step===1)T.code=genCode(false);}
-    const n=T.fails.length;raise(n>=CONFIG.failsForL3?3:n>=CONFIG.failsForL2?2:n>=CONFIG.failsForL1?1:0,'failed_submit');
-    render();window.scrollTo({top:0});return;
+  if($('#back'))$('#back').onclick=()=>{T.step--;T.banner=null;T.invalid=[];render();};
+  if(T.step===0){
+    $('#go').onclick=doSearch;$('#q').onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();doSearch();}};
+    $('#next').onclick=step1Next;
+  } else if(T.step===1){
+    const frm=$('#frm');
+    frm.addEventListener('input',e=>{const id=e.target.dataset.f;if(id)T.values[id]=e.target.value;});
+    frm.addEventListener('paste',e=>{if(e.target.dataset.f==='pin'&&on('maskedPin'))e.preventDefault();});
+    frm.addEventListener('focusout',e=>{const id=e.target.dataset.f;if(!id)return;const f=FIELDS.find(x=>x.id===id);
+      if(!on('strictInput')&&f.fix){const nv=f.fix(e.target.value);if(nv!==e.target.value){e.target.value=nv;T.values[id]=nv;}}
+      if(!on('vagueErrors')){T.touched[id]=true;const w=e.target.closest('.field'),d=document.createElement('div');d.innerHTML=fieldHTML(f);if(w&&d.firstElementChild&&id!=='pin')w.replaceWith(d.firstElementChild);}});
+    if($('#pinShow'))$('#pinShow').onclick=()=>{T.showPin=!T.showPin;render();};
+    $('#next').onclick=step2Next;
+  } else {
+    $('#ack').onchange=e=>T.values.ack=e.target.checked;
+    $('#next').onclick=registerNow;
   }
-  T.showErrors=false;T.invalid=[];
-  if(T.step===0)return checkin(()=>{T.step=1;render();window.scrollTo({top:0});});
-  processing();
 }
-function clearAll(){T.cleared++;T.values={};T.termsRead=false;T.step=0;T.showErrors=false;T.invalid=[];T.code=genCode(T.easy);render();toast('Form cleared','All your answers were removed.');}
-function processing(){
-  const slow=on('slowSubmit'),re=on('reauth');T.modal=true;
-  modal(`<div style="text-align:center"><div class="spinner" aria-hidden="true"></div><p>Processing\u2026</p>${slow?'<p class="muted">Please don\u2019t close or refresh this page.</p>':''}</div>`);
+function cartClicks(e){
+  const add=e.target.closest('[data-add]'),rm=e.target.closest('[data-rm]'),fx=e.target.closest('[data-swap]');
+  if(add&&!add.disabled){const id=add.dataset.add;if(T.cart.includes(id))return;
+    if(T.cart.length>=3){T.banner=buildBanner({type:'max'});setback();render();return;}
+    T.cart.push(id);T.banner=null;rerenderStep0();}
+  if(rm){T.cart=T.cart.filter(x=>x!==rm.dataset.rm);rerenderStep0();}
+  if(fx){const [from,to]=fx.dataset.swap.split('|');T.cart=T.cart.map(x=>x===from?to:x);T.banner=null;rerenderStep0();}
+}
+function rerenderStep0(){if(T.banner){render(true);return;}$('#results').innerHTML=resultsHTML();$('#cartBox').innerHTML=cartHTML();}
+function doSearch(){
+  T.query=$('#q').value;T.results=find(T.query);
+  if(T.results&&!T.results.length){T.emptySearches++;setback(.5);}
+  $('#results').innerHTML=resultsHTML();
+}
+
+/* ===================== Validation ===================== */
+function cartProblems(){
+  const p=[];
+  const codes=T.cart.map(id=>SECS.find(x=>x.id===id).code);
+  REQUIRED.filter(c=>!codes.includes(c)).forEach(c=>p.push({kind:'missing',code:c}));
+  codes.filter(c=>!REQUIRED.includes(c)).forEach(c=>p.push({kind:'extra',code:c}));
+  return p;
+}
+function regProblems(){
+  const p=[];
+  T.cart.forEach(id=>{if(T.seats[id]<=0&&!held(id))p.push({kind:'full',id});});
+  for(let i=0;i<T.cart.length;i++)for(let j=i+1;j<T.cart.length;j++){const a=SECS.find(x=>x.id===T.cart[i]),b=SECS.find(x=>x.id===T.cart[j]);if(overlap(a,b))p.push({kind:'conflict',a:a.id,b:b.id});}
+  return p;
+}
+function altFor(id,others){ // an open section of the same course with no conflict
+  const s=SECS.find(x=>x.id===id);
+  return SECS.find(x=>x.code===s.code&&x.id!==id&&(T.seats[x.id]>0)&&!others.map(o=>SECS.find(y=>y.id===o)).some(o=>overlap(x,o)));
+}
+function buildBanner(raw){
+  const explain=!on('vagueErrors'),fixes=!on('noFixes');
+  let html='';
+  if(raw.type==='max')html=explain?'You can register for 3 courses. Remove one before adding another.':'Maximum course load exceeded.';
+  if(raw.type==='cart')html=explain?`<b>Your cart needs a change:</b><ul>${raw.p.map(x=>`<li>${x.kind==='missing'?`${x.code} is missing.`:`${x.code} isn\u2019t one of your three courses.`}</li>`).join('')}</ul>`:'Your cart does not meet registration requirements.';
+  if(raw.type==='reg'){
+    if(!explain)html=`Registration was unsuccessful for one or more classes. (Error REG-409)`;
+    else html=`<b>Almost there. ${raw.p.length} thing${raw.p.length>1?'s':''} to fix:</b><ul>${raw.p.map(x=>{
+      if(x.kind==='full'){const s=SECS.find(y=>y.id===x.id),alt=fixes&&altFor(x.id,T.cart.filter(c=>c!==x.id));
+        return `<li>${s.code} Section ${s.sec} filled up while you were registering.${alt?`<div class="fix"><button class="btn sm teal" data-swap="${x.id}|${alt.id}">Switch to Section ${alt.sec} (${when(alt)})</button></div>`:''}</li>`;}
+      const a=SECS.find(y=>y.id===x.a),b=SECS.find(y=>y.id===x.b),alt=fixes&&(altFor(b.id,T.cart.filter(c=>c!==b.id))||altFor(a.id,T.cart.filter(c=>c!==a.id)));
+      return `<li>${a.code} and ${b.code} meet at the same time (${a.days.filter(d=>b.days.includes(d)).join(', ')} ${t12(a.s)}).${alt?`<div class="fix"><button class="btn sm teal" data-swap="${alt.code===b.code?b.id:a.id}|${alt.id}">Switch ${alt.code} to Section ${alt.sec} (${when(alt)})</button></div>`:''}</li>`;}).join('')}</ul>`;
+  }
+  return {raw,html:`<div class="banner" role="alert">${html}</div>`};
+}
+function step1Next(){
+  const p=cartProblems();
+  if(p.length){T.banner=buildBanner({type:'cart',p});setback();render();window.scrollTo({top:0});return;}
+  T.banner=null;checkin(()=>{T.step=1;render();window.scrollTo({top:0});});
+}
+function step2Next(){
+  FIELDS.forEach(f=>{const el=document.getElementById('f_'+f.id);if(el){let v=el.value;if(!on('strictInput')&&f.fix)v=f.fix(v);T.values[f.id]=v;}});
+  T.invalid=FIELDS.filter(f=>!f.ok(T.values[f.id]||'')).map(f=>f.id);
+  if(T.invalid.length){
+    T.errors+=T.invalid.length;if(on('wipeOnError'))T.values.pin='';
+    T.banner={html:`<div class="banner" role="alert">${on('vagueErrors')?'Please correct the errors on this page.':`${T.invalid.length} field${T.invalid.length>1?'s need':' needs'} a fix. Each one says what to change.`}</div>`};
+    setback();render();window.scrollTo({top:0});return;
+  }
+  T.banner=null;T.invalid=[];T.step=2;render();window.scrollTo({top:0});
+}
+function registerNow(){
+  if(!T.values.ack){T.banner={html:`<div class="banner" role="alert">${on('vagueErrors')?'Unable to process request.':'Tick the box to confirm you understand the tuition charges.'}</div>`};setback();render();return;}
+  const slow=on('slowSubmit');T.modal=true;
+  modal(`<div style="text-align:center"><div class="spinner" aria-hidden="true"></div><p>Submitting your registration\u2026</p>${slow?'<p class="muted">Do not press Back or refresh this page.</p>':''}</div>`);
   setTimeout(()=>{
-    if(T.outcome)return;
-    if(!re){closeModal();T.modal=false;return finish('completed');}
-    T.interrupts++;
-    modal(`<h2>Your session has expired</h2><p>For your security, re-enter your password to finish.</p><div class="field"><input type="password" id="reIn" aria-label="Password" autocomplete="off"><div class="err" id="reErr"></div></div><div class="actions"><span></span><button class="btn" id="reGo">Continue</button></div>`);
-    $('#reIn').focus();
-    $('#reGo').onclick=()=>{if($('#reIn').value===T.values.pw){closeModal();T.modal=false;finish('completed');}else{T.fails.push(now());$('#reIn').value='';$('#reErr').textContent='Incorrect password.';}};
-  },slow?5000:700);
+    closeModal();T.modal=false;if(T.outcome)return;
+    const p=regProblems();
+    if(p.length){T.regFails++;T.step=0;T.banner=buildBanner({type:'reg',p});setback();render();window.scrollTo({top:0});return;}
+    finish('registered');
+  },slow?4000:900);
 }
 
 /* ===================== Interruptions & modals ===================== */
 function modal(h){$('#modalSlot').innerHTML=`<div class="overlay"><div class="modal" role="dialog" aria-modal="true">${h}</div></div>`;}
 function closeModal(){$('#modalSlot').innerHTML='';}
 function toast(h,m){$('#toastSlot').innerHTML=`<div class="toast" role="status"><b>${esc(h)}</b>${esc(m)}<button aria-label="Dismiss">\u00d7</button></div>`;const k=()=>$('#toastSlot').innerHTML='';$('#toastSlot button').onclick=k;setTimeout(k,5000);}
+const NOTIFS=[['Canvas','New announcement posted in one of your courses.'],['Outlook','You have 9 unread emails.'],['Student Hub','High traffic: pages may load slowly.'],['Financial Services','A new e-bill is available.']];
 function notif(){T.interrupts++;const n=NOTIFS[Math.floor(Math.random()*NOTIFS.length)];toast(n[0],n[1]);}
-function cookie(){
-  T.interrupts++;
-  $('#cookieSlot').innerHTML=`<div class="cookie" role="dialog" aria-label="Cookie notice"><div class="row"><p><strong>We value your privacy.</strong> We and our 312 partners use cookies to personalize your experience.</p>
-    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><button class="btn" id="ck1">Accept all</button><button class="shame" id="ck2">No thanks, I prefer a worse website</button></div></div></div>`;
-  $('#ck1').onclick=$('#ck2').onclick=()=>$('#cookieSlot').innerHTML='';
+function survey(){
+  T.shown.survey=true;T.modal=true;T.interrupts++;
+  $('#intSlot').innerHTML=`<div class="overlay"><div class="modal" role="dialog" aria-modal="true"><button class="x" id="sx">close</button><h2>How\u2019s your experience so far?</h2><p>Help us improve Student Hub by answering a quick 10-question survey.</p><div class="actions"><button class="btn quiet" id="sn">Maybe later</button><button class="btn" id="sy">Start survey</button></div></div></div>`;
+  const d=()=>{$('#intSlot').innerHTML='';T.modal=false;};$('#sx').onclick=$('#sn').onclick=$('#sy').onclick=d;
 }
-function newsletter(){
-  T.shown.nl=true;T.modal=true;T.interrupts++;
-  $('#intSlot').innerHTML=`<div class="overlay"><div class="modal" role="dialog" aria-modal="true"><button class="x" id="nx">close</button>
-    <h2>Don\u2019t miss out, Husky!</h2><p>Get campus deals and event updates in your inbox every day.</p>
-    <div class="actions"><button class="shame" id="nn">No, I don\u2019t like free stuff</button><button class="btn" id="ny">Sign me up</button></div></div></div>`;
-  const d=()=>{$('#intSlot').innerHTML='';T.modal=false;};$('#nx').onclick=$('#nn').onclick=$('#ny').onclick=d;
+function sessionWarn(){
+  T.shown.session=true;T.modal=true;T.interrupts++;let s=CONFIG.sessionGrace;
+  $('#intSlot').innerHTML=`<div class="overlay"><div class="modal" role="alertdialog" aria-modal="true"><h2>Are you still there?</h2><p>For your security, you\u2019ll be signed out in <strong id="sw">${s}</strong> seconds.</p><div class="actions"><span></span><button class="btn" id="swGo">Stay signed in</button></div></div></div>`;
+  const iv=setInterval(()=>{s--;if($('#sw'))$('#sw').textContent=s;if(s<=0){clearInterval(iv);close();T.values={};T.cart=[];T.step=0;T.banner={html:'<div class="banner" role="alert">Your session expired. Please start again.</div>'};render();}},1000);
+  const close=()=>{clearInterval(iv);$('#intSlot').innerHTML='';T.modal=false;};T.sessIv=iv;
+  $('#swGo').onclick=close;
 }
-function chat(){
-  T.shown.chat=true;T.interrupts++;
-  $('#chatSlot').innerHTML=`<div class="chat" role="complementary" aria-label="Chat"><div class="bar"><span>Student Hub assistant</span><button id="cx" aria-label="Minimize chat">\u2013</button></div><div class="body"><span class="bubble">Hi! \ud83d\udc4b Need help updating your profile?</span></div></div>`;
-  $('#cx').onclick=()=>$('#chatSlot').innerHTML='';
-}
-function quiet(){['#cookieSlot','#chatSlot','#intSlot','#toastSlot','#shiftSlot'].forEach(s=>{const e=$(s);if(e)e.innerHTML='';});T.modal=false;}
+function quiet(){['#intSlot','#toastSlot'].forEach(s=>$(s).innerHTML='');if(T.sessIv)clearInterval(T.sessIv);T.modal=false;}
 function checkin(after){
   pause(true);T.modal=true;
   modal(`<h2>Quick check-in</h2><p>How stressed do you feel right now?</p><div class="scale">${[1,2,3,4,5].map(n=>`<button data-v="${n}">${n}</button>`).join('')}</div><div class="scale-ends"><span>Not at all</span><span>Very</span></div>`);
@@ -408,10 +541,10 @@ function checkin(after){
 }
 function offerBreak(){
   T.breakOffered=true;pause(true);T.modal=true;
-  modal(`<h2>Want a short break?</h2><p>This seems to be getting frustrating. Take ${CONFIG.breakSeconds} seconds. Your answers are kept and the timer is paused.</p><div class="actions"><button class="btn ghost" id="bn">Keep going</button><button class="btn teal" id="by">Take a break</button></div>`);
+  modal(`<h2>Want a short break?</h2><p>This looks frustrating. Your seats are held and the clock is paused, so you can step away for ${CONFIG.breakSeconds} seconds.</p><div class="actions"><button class="btn ghost" id="bn">Keep going</button><button class="btn teal" id="by">Take a break</button></div>`);
   const end=()=>{closeModal();T.modal=false;pause(false);};
   $('#bn').onclick=end;
-  $('#by').onclick=()=>{T.breakTaken=true;let s=CONFIG.breakSeconds;modal(`<h2>Take a breath</h2><p>Look away from the screen for a moment.</p><p style="font-size:2rem;font-weight:700" id="bc">${s}</p><div class="actions"><span></span><button class="btn ghost" id="br">I\u2019m ready</button></div>`);
+  $('#by').onclick=()=>{T.breakTaken=true;let s=CONFIG.breakSeconds;modal(`<h2>Take a breath</h2><p>Look away from the screen for a moment. Nothing will be lost.</p><p style="font-size:2rem;font-weight:700" id="bc">${s}</p><div class="actions"><span></span><button class="btn ghost" id="br">I\u2019m ready</button></div>`);
     const iv=setInterval(()=>{s--;if($('#bc'))$('#bc').textContent=Math.max(0,s);if(s<=0)d();},1000);const d=()=>{clearInterval(iv);end();};$('#br').onclick=d;};
 }
 
@@ -419,27 +552,26 @@ function offerBreak(){
 function finish(outcome){
   if(T.outcome)return;pause(false);T.outcome=outcome;clearInterval(T.timer);clearInterval(T.scorer);track.on=false;quiet();closeModal();$('#timerSlot').innerHTML='';$('#meter').hidden=true;
   const secs=Math.round((now()-T.t0-T.pausedMs)/1000),other=T.cond==='adaptive'?'frustrating':'adaptive';
-  const head={completed:'Submitted!',timeout:'Time\u2019s up.',stopped:'You stopped. Totally fair.'}[outcome];
-  const lv=T.levels.length?T.levels.map(l=>`level ${l.level} at ${l.at}s`).join(', '):'none';
-  const result={version:T.cond,outcome,seconds:secs,failed_submits:T.fails.length,field_errors:T.errors,interruptions:T.interrupts,rage_clicks:T.rage.length,peak_score:T.peak,max_level:T.level,checkin:T.checkin??'',break_taken:T.breakTaken?1:0,cleared_form:T.cleared};
+  const head={registered:'You\u2019re registered!',timeout:'The registration window closed.',stopped:'You stopped. Totally fair.'}[outcome];
+  const lv=T.levels.length?T.levels.map(l=>`level ${l.level} at ${l.at}s`).join(', '):'it didn\u2019t need to';
+  const result={version:T.cond,outcome,seconds:secs,setbacks:T.fails.length+T.half.length,empty_searches:T.emptySearches,failed_registrations:T.regFails,field_errors:T.errors,interruptions:T.interrupts,rage_clicks:T.rage.length,peak_score:T.peak,max_level:T.level,checkin:T.checkin??'',break_taken:T.breakTaken?1:0};
   if(CONFIG.SUBMIT_URL){try{fetch(CONFIG.SUBMIT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({summary:result})});}catch(e){}}
   $('#app').innerHTML=`<div class="panel"><h1>${head}</h1>
-    <p class="muted">You used the <strong>${T.cond==='adaptive'?'stress-aware':'frustrating'}</strong> version. The form was fake and built to be annoying, so any trouble was its fault, not yours.</p>
+    <p class="muted">You used the <strong>${T.cond==='adaptive'?'stress-aware':'regular'}</strong> version. This was a fake registration built to be frustrating, so any trouble was the system\u2019s fault, not yours.</p>
     <div class="stats">
-      <div class="stat"><b>${secs}s</b><span>time on the form</span></div>
-      <div class="stat"><b>${T.fails.length}</b><span>failed submits</span></div>
+      <div class="stat"><b>${secs}s</b><span>time spent</span></div>
+      <div class="stat"><b>${T.fails.length+T.half.length}</b><span>setbacks (failed searches, errors)</span></div>
       <div class="stat"><b>${T.interrupts}</b><span>interruptions</span></div>
       <div class="stat"><b>${T.peak}</b><span>peak stress score</span></div>
     </div>
-    ${T.cond==='adaptive'?`<p><strong>How the form adapted:</strong> ${esc(lv)}${T.breakTaken?', and you took a break':''}.</p>`:''}
-    <div class="actions"><button class="btn ghost" id="home">Back to start</button><button class="btn ${other==='adaptive'?'teal':''}" id="other">Try the ${other==='adaptive'?'stress-aware':'frustrating'} version</button></div></div>
-  <p class="disclaim">Git Girls, HCI class prototype. Not an official Northeastern University page.</p>`;
-  $('#home').onclick=home;$('#other').onclick=()=>start(other);
+    ${T.cond==='adaptive'?`<p><strong>How it adapted:</strong> ${esc(lv)}${T.breakTaken?', and you took a break':''}. You still did every step.</p>`:''}
+    <div class="actions"><button class="btn ghost" id="home">Back to start</button><button class="btn ${other==='adaptive'?'teal':''}" id="other">Try the ${other==='adaptive'?'stress-aware':'regular'} version</button></div></div>
+  <p class="disclaim">Git Girls, Northeastern HCI class prototype. Not an official Northeastern University page.</p>`;
+  $('#home').onclick=hub;$('#other').onclick=()=>queue(other);
 }
 
-const TERMS=`<p>1. By using Student Hub you agree to follow all university policies, as updated from time to time.</p><p>2. Profile information may be shared with university offices to provide services.</p><p>3. Accounts are personal and may not be shared.</p><p>4. The university may change these terms at any time without notice.</p><p>5. Continued use of Student Hub after a change means you accept the new terms.</p>`;
-
-home();
+document.addEventListener('click',e=>{if(T&&!T.outcome&&T.step===0)cartClicks(e);});
+hub();
 </script>
 </body>
 </html>
